@@ -6,6 +6,57 @@ spring:
       on-profile: local,dev,prod
   application:
     name: apigateway-service
+  cloud:
+    gateway:
+      routes:
+        # member service
+        - id: member-service
+          uri: lb://MEMBER-SERVICE
+          predicates:
+            - Path=/member-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+        # delivery service
+        - id: delivery-service
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/delivery-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
+        # notification service
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+        # project service
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+        # payment service
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+        # funding service
+        - id: funding-service
+          uri: lb://FUNDING-SERVICE
+          predicates:
+            - Path=/funding-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
 management:
   endpoints:
     web:
