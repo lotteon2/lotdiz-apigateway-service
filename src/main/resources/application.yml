@@ -57,6 +57,14 @@ spring:
             - Method=GET,POST
           filters:
             - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
+        # notification service
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
 management:
   endpoints:
     web:
