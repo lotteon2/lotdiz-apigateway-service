@@ -8,8 +8,40 @@ spring:
     name: apigateway-service
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+#              - http://localhost:3000
+#              - http://127.0.0.1:3000
+            allow-credentials: true
+            allowedHeaders:
+              - authorization
+              - content-type
+              - credential
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
       routes:
         # member service
+        - id: member-service
+          uri: lb://MEMBER-SERVICE
+          predicates:
+            - Path=/member-service/api/sign-up # 회원가입
+            - Method=GET,POST
+          filters:
+            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+        - id: member-service
+          uri: lb://MEMBER-SERVICE
+          predicates:
+            - Path=/member-service/api/sign-in # 로그인
+            - Method=GET,POST
+          filters:
+            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
@@ -17,6 +49,15 @@ spring:
             - Method=GET,POST
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+#        - id: member-service
+#          uri: lb://MEMBER-SERVICE
+#          predicates:
+#            - Path=/member-service/api/**
+#            - Method=GET,POST
+#          filters:
+#            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
         # delivery service
         - id: delivery-service
           uri: lb://DELIVERY-SERVICE

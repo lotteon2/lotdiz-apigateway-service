@@ -10,3 +10,7 @@ eureka:
       defaultZone: http://127.0.0.1:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${server.port}
+
+# TO DO: 암호화
+jwt:
+  secret: d29vLXRlY2gtc3ByaW5nLWJvb3Qtand0LXNlY3JldC13b28tdGVjaC1zcHJpbmctYm9vdC1qd3Qtc2VjcmV0LXdvby10ZWNoLXNwcmluZy1ib290LWp3dC1zZWNyZXQ=
