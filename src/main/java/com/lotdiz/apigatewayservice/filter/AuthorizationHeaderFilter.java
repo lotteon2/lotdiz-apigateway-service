@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import javax.crypto.SecretKey;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -24,6 +25,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 public class AuthorizationHeaderFilter
     extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
@@ -39,7 +41,7 @@ public class AuthorizationHeaderFilter
   @Override
   public GatewayFilter apply(Config config) {
     return ((exchange, chain) -> {
-      logger.info("AuthorizationHeaderFilter here");
+      log.info("AuthorizationHeaderFilter here");
 
       ServerHttpRequest request = exchange.getRequest();
 
@@ -47,7 +49,7 @@ public class AuthorizationHeaderFilter
       PathPattern pathPattern = null;
       PathContainer pathContainer =
           PathContainer.parsePath(request.getPath().pathWithinApplication().value());
-      logger.info("path: " + request.getPath().pathWithinApplication().value());
+      log.info("path: " + request.getPath().pathWithinApplication().value());
 
       String username = null;
       if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // 로그인 중
@@ -68,7 +70,7 @@ public class AuthorizationHeaderFilter
 
         // Token 정보를 까서 memberId를 header에 저장
         String memberId = claims.get("memberId", String.class);
-        logger.info("memberId: " + memberId);
+        log.info("memberId: " + memberId);
         exchange.getRequest().mutate().header("memberId", memberId).build();
 
         // if path = /admin-service/** -> Role 확인 (admin인지)
@@ -83,7 +85,7 @@ public class AuthorizationHeaderFilter
         // project는 비로그인이어도 갈 수 있는 페이지가 존재.
         pathPattern = pathPatternParser.parse("/api/projects/**");
         String curPath = request.getPath().toString();
-        logger.info("curPath: " + curPath);
+        log.info("curPath: " + curPath);
         if (pathPattern.matches(pathContainer)) { // if, access MSA is project-service
           if (!curPath.contains("support-signature") && !curPath.contains("makers")) {
             username = "NON_MEMBER";
@@ -94,7 +96,7 @@ public class AuthorizationHeaderFilter
           return onError(exchange, "no authorization header", HttpStatus.UNAUTHORIZED);
         }
       }
-      logger.info("AuthorizationHeader Filter End");
+      log.info("AuthorizationHeader Filter End");
       return chain.filter(exchange);
     });
   }
@@ -115,7 +117,7 @@ public class AuthorizationHeaderFilter
     ServerHttpResponse response = exchange.getResponse();
     response.setStatusCode(httpStatus);
 
-    logger.error(error);
+    log.error(error);
 
     return response.setComplete();
   }
