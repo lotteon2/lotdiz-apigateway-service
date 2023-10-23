@@ -8,17 +8,17 @@ spring:
     name: apigateway-service
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
       globalcors:
         cors-configurations:
           "[/**]":
             allowedOrigins:
-#              - http://localhost:3000
-#              - http://127.0.0.1:3000
+              - http://localhost:5173
+              - http://127.0.0.1:5173
             allow-credentials: true
             allowedHeaders:
-              - authorization
-              - content-type
-              - credential
+              - "*"
             allowedMethods:
               - GET
               - POST
@@ -32,7 +32,7 @@ spring:
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/api/sign-up # 회원가입
-            - Method=GET,POST
+            - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
         - id: member-service
@@ -46,66 +46,64 @@ spring:
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-#        - id: member-service
-#          uri: lb://MEMBER-SERVICE
-#          predicates:
-#            - Path=/member-service/api/**
-#            - Method=GET,POST
-#          filters:
-#            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
-#            - AuthorizationHeaderFilter
         # delivery service
         - id: delivery-service
           uri: lb://DELIVERY-SERVICE
           predicates:
             - Path=/delivery-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         # notification service
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notification-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         # project service
         - id: project-service
           uri: lb://PROJECT-SERVICE
           predicates:
             - Path=/project-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         # payment service
         - id: payment-service
           uri: lb://PAYMENT-SERVICE
           predicates:
             - Path=/payment-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         # funding service
         - id: funding-service
           uri: lb://FUNDING-SERVICE
           predicates:
             - Path=/funding-service/**
-            - Method=GET,POST
+            - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
-        # notification service
-        - id: notification-service
-          uri: lb://NOTIFICATION-SERVICE
+            - AuthorizationHeaderFilter
+        # admin service
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
           predicates:
-            - Path=/notification-service/**
-            - Method=GET,POST
+            - Path=/funding-service/**
+            - Method=GET,POST,PUT,DELETE
           filters:
-            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
 management:
   endpoints:
     web:
