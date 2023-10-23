@@ -106,6 +106,14 @@ spring:
           filters:
             - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+        # config service
+        - id: config-service
+          uri: lb://CONFIG-SERVICE
+          predicates:
+            - Path=/config-service/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/config-service/(?<segment>.*), /$\{segment}
 management:
   endpoints:
     web:
