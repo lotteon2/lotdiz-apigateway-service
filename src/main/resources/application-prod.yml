@@ -1,8 +1,7 @@
-
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
     import: optional:configserver:http://config-service:8888
   # rabbitmq settings
   rabbitmq:
