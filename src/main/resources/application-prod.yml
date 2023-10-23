@@ -2,6 +2,13 @@ spring:
   config:
     activate:
       on-profile: prod
+    import: optional:configserver:http://config-service:8888
+  # rabbitmq settings
+  rabbitmq:
+    host: rabbitmq-service
+    port: 5672
+    username: guest
+    password: guest
 eureka:
   client:
     register-with-eureka: true
