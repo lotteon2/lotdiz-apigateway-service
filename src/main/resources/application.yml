@@ -7,6 +7,8 @@ spring:
   application:
     name: apigateway-service
   cloud:
+    config:
+      name: apigateway-service
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
@@ -99,13 +101,13 @@ spring:
         - id: admin-service
           uri: lb://ADMIN-SERVICE
           predicates:
-            - Path=/funding-service/**
+            - Path=/admin-service/**
             - Method=GET,POST,PUT,DELETE
           filters:
-            - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
 management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, refresh, busrefresh
