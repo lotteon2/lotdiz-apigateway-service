@@ -12,24 +12,6 @@ spring:
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-      globalcors:
-        cors-configurations:
-          "[/**]":
-            allowedOrigins:
-              - http://localhost:5173
-              - http://127.0.0.1:5173
-              - https://lotdiz.lotteedu.com
-              - https://admin.lotdiz.lotteedu.com
-            allow-credentials: true
-            allowedHeaders:
-              - "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
       routes:
         # member service
         - id: member-service
@@ -43,14 +25,14 @@ spring:
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/api/sign-in # 로그인
-            - Method=GET,POST
+            - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -59,7 +41,7 @@ spring:
           uri: lb://DELIVERY-SERVICE
           predicates:
             - Path=/delivery-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -68,7 +50,7 @@ spring:
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notification-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -77,7 +59,7 @@ spring:
           uri: lb://PROJECT-SERVICE
           predicates:
             - Path=/project-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -86,7 +68,7 @@ spring:
           uri: lb://PAYMENT-SERVICE
           predicates:
             - Path=/payment-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -95,7 +77,7 @@ spring:
           uri: lb://FUNDING-SERVICE
           predicates:
             - Path=/funding-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -104,7 +86,7 @@ spring:
           uri: lb://ADMIN-SERVICE
           predicates:
             - Path=/admin-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
@@ -113,7 +95,7 @@ spring:
           uri: lb://CONFIG-SERVICE
           predicates:
             - Path=/config-service/**
-            - Method=GET,POST
+            - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/config-service/(?<segment>.*), /$\{segment}
 management:
