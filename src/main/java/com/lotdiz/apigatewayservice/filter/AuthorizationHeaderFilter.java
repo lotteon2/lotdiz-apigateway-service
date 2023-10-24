@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.env.Environment;
@@ -29,13 +30,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthorizationHeaderFilter
     extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
-  private final Logger logger = LoggerFactory.getLogger(AuthorizationHeaderFilter.class);
 
-  private final Environment env;
+//  private final Environment env;
 
-  public AuthorizationHeaderFilter(Environment env) {
+  @Value("${jwt.secret}")
+  private String secret;
+
+  public AuthorizationHeaderFilter() {
     super(Config.class);
-    this.env = env;
   }
 
   @Override
@@ -56,7 +58,7 @@ public class AuthorizationHeaderFilter
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
         String jwt = jwtHeader.replace("Bearer ", "");
 
-        String secret = env.getProperty("jwt.secret");
+//        String secret = env.getProperty("jwt.secret");
         log.info("secret={}", secret);
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
