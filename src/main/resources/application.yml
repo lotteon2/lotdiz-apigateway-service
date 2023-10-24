@@ -18,6 +18,8 @@ spring:
             allowedOrigins:
               - http://localhost:5173
               - http://127.0.0.1:5173
+              - https://lotdiz.lotteedu.com
+              - https://admin.lotdiz.lotteedu.com
             allow-credentials: true
             allowedHeaders:
               - "*"
