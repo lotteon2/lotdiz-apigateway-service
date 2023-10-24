@@ -57,6 +57,7 @@ public class AuthorizationHeaderFilter
         String jwt = jwtHeader.replace("Bearer ", "");
 
         String secret = env.getProperty("jwt.secret");
+        log.info("secret={}", secret);
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
