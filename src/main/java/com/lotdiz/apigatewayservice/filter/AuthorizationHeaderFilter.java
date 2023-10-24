@@ -31,8 +31,6 @@ import reactor.core.publisher.Mono;
 public class AuthorizationHeaderFilter
     extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
 
-//  private final Environment env;
-
   @Value("${jwt.secret}")
   private String secret;
 
@@ -58,8 +56,6 @@ public class AuthorizationHeaderFilter
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
         String jwt = jwtHeader.replace("Bearer ", "");
 
-//        String secret = env.getProperty("jwt.secret");
-        log.info("secret={}", secret);
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
