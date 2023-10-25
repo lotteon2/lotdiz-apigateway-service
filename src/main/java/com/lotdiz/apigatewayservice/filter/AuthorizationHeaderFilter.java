@@ -45,13 +45,7 @@ public class AuthorizationHeaderFilter
 
       ServerHttpRequest request = exchange.getRequest();
 
-      PathPatternParser pathPatternParser = new PathPatternParser();
-      PathPattern pathPattern = null;
-      PathContainer pathContainer =
-          PathContainer.parsePath(request.getPath().pathWithinApplication().value());
-      log.info("path: " + request.getPath().pathWithinApplication().value());
-
-      String username = null;
+      log.info("request path: " + request.getPath().pathWithinApplication().value());
       if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // 로그인 중
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
         String jwt = jwtHeader.replace("Bearer ", "");
@@ -61,7 +55,7 @@ public class AuthorizationHeaderFilter
 
         Claims claims = checkValid(jwt, key); // 토큰 유효성 검사
 
-        username = claims.get("username", String.class);
+        String username = claims.get("username", String.class);
 
         if (username == null) {
           return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
@@ -69,32 +63,22 @@ public class AuthorizationHeaderFilter
 
         // Token 정보를 까서 memberId를 header에 저장
         String memberId = claims.get("memberId", String.class);
-        log.info("memberId: " + memberId);
         exchange.getRequest().mutate().header("memberId", memberId).build();
 
-        // if path = /admin-service/** -> Role 확인 (admin인지)
-        pathPattern = pathPatternParser.parse("/api/admin/**");
-        if (pathPattern.matches(pathContainer)) {
+        // 어드민 프론트
+        String origin = request.getHeaders().getOrigin();
+        if(origin.equals("admin.lotdiz.lotteedu.com")) {
           String auth = claims.get("auth", String.class);
           if (!auth.equals("ADMIN")) { // admin 이 아니면 403
             return onError(exchange, "Not Admin", HttpStatus.FORBIDDEN);
           }
+          return chain.filter(exchange);
         }
-      } else { // 비로그인 중
-        // project는 비로그인이어도 갈 수 있는 페이지가 존재.
-        pathPattern = pathPatternParser.parse("/api/projects/**");
-        String curPath = request.getPath().toString();
-        log.info("curPath: " + curPath);
-        if (pathPattern.matches(pathContainer)) { // if, access MSA is project-service
-          if (!curPath.contains("support-signature") && !curPath.contains("makers")) {
-            username = "NON_MEMBER";
-          } else {
-            return onError(exchange, "no authorization header", HttpStatus.UNAUTHORIZED);
-          }
-        } else {
-          return onError(exchange, "no authorization header", HttpStatus.UNAUTHORIZED);
-        }
+
+      } else {
+        return onError(exchange, "no authorization header", HttpStatus.UNAUTHORIZED);
       }
+
       log.info("AuthorizationHeader Filter End");
       return chain.filter(exchange);
     });
