@@ -80,12 +80,19 @@ spring:
               /project-service/api/projects,
               /project-service/api/projects/lotdeal,
               /project-service/api/projects/category/{variable:.*},
-              /project-service/api/projects/special-exhibition
-              /project-service/api/projects/{variable:.*}
-              /project-service/api/projects/1/support-signature
+              /project-service/api/projects/special-exhibition,
+              /project-service/api/projects/{variable:.*},
             - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/api/projects/{variable:.*}/support-signature
+            - Method=GET
+          filters:
+            - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+
         # Black List
         - id: project-service
           uri: lb://PROJECT-SERVICE
