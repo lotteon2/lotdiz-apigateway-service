@@ -11,107 +11,154 @@ spring:
       name: apigateway-service
     gateway:
       default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-      globalcors:
-        cors-configurations:
-          "[/**]":
-            allowedOrigins:
-              - http://localhost:5173
-              - http://127.0.0.1:5173
-            allow-credentials: true
-            allowedHeaders:
-              - "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials Access-Control-Expose-Headers
       routes:
-        # member service
+        ## member service
+        # White List
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
-            - Path=/member-service/api/sign-up # 회원가입
+            - Path=/member-service/actuator/health,/member-service/api/sign-up,/member-service/api/sign-in
             - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
-        - id: member-service
-          uri: lb://MEMBER-SERVICE
-          predicates:
-            - Path=/member-service/api/sign-in # 로그인
-            - Method=GET,POST
-          filters:
-            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # delivery service
+
+        ## delivery service
+        # White List
+        - id: delivery-service
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/delivery-service/actuator/health
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: delivery-service
           uri: lb://DELIVERY-SERVICE
           predicates:
             - Path=/delivery-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # notification service
+
+        ## notification service
+        # White List
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/actuator/health
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notification-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # project service
+
+        ## project service
+        # White List
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/actuator/health,
+              /project-service/api/projects/banner,
+              /project-service/api/projects,
+              /project-service/api/projects/lotdeal,
+              /project-service/api/projects/category/*,
+              /project-service/api/projects/special-exhibition
+              /project-service/api/projects/*
+              /project-service/api/projects/1/support-signature
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: project-service
           uri: lb://PROJECT-SERVICE
           predicates:
             - Path=/project-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # payment service
+
+        ## payment service
+        # White List
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/actuator/health,/payment-service/**
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: payment-service
           uri: lb://PAYMENT-SERVICE
           predicates:
             - Path=/payment-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # funding service
+
+        ## funding service
+        # White List
+        - id: funding-service
+          uri: lb://FUNDING-SERVICE
+          predicates:
+            - Path=/funding-service/actuator/health,/funding-service/api/projects/*/supporter-with-us
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: funding-service
           uri: lb://FUNDING-SERVICE
           predicates:
             - Path=/funding-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/funding-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # admin service
+
+        ## admin service
+        # White List
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/actuator/health
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+        # Black List
         - id: admin-service
           uri: lb://ADMIN-SERVICE
           predicates:
             - Path=/admin-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-        # config service
+
+        ## config service
         - id: config-service
           uri: lb://CONFIG-SERVICE
           predicates:
             - Path=/config-service/**
-            - Method=GET,POST
+            - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/config-service/(?<segment>.*), /$\{segment}
 management:
