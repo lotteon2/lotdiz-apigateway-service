@@ -47,6 +47,9 @@ public class AuthorizationHeaderFilter
 
       log.info("request path: " + request.getPath().pathWithinApplication().value());
       if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // 로그인 중
+        if(request.getHeaders().get(HttpHeaders.AUTHORIZATION) == null) {
+          return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
+        }
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
         String jwt = jwtHeader.replace("Bearer ", "");
 
@@ -67,7 +70,7 @@ public class AuthorizationHeaderFilter
 
         // 어드민 프론트
         String origin = request.getHeaders().getOrigin();
-        if(origin.equals("admin.lotdiz.lotteedu.com")) {
+        if(origin != null && origin.equals("admin.lotdiz.lotteedu.com")) {
           String auth = claims.get("auth", String.class);
           if (!auth.equals("ADMIN")) { // admin 이 아니면 403
             return onError(exchange, "Not Admin", HttpStatus.FORBIDDEN);
