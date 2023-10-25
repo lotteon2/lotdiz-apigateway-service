@@ -51,11 +51,6 @@ public class AuthorizationHeaderFilter
           PathContainer.parsePath(request.getPath().pathWithinApplication().value());
       log.info("path: " + request.getPath().pathWithinApplication().value());
 
-      if(request.getPath().pathWithinApplication().value().equals("/member-service/api/sign-in")) {
-        log.info("sign-in 요청");
-        return chain.filter(exchange);
-      }
-
       String username = null;
       if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // 로그인 중
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);

@@ -11,7 +11,7 @@ spring:
       name: apigateway-service
     gateway:
       default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials Access-Control-Expose-Headers
       routes:
         # member service
         - id: member-service
