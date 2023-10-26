@@ -72,7 +72,7 @@ public class AuthorizationHeaderFilter
         String origin = request.getHeaders().getOrigin();
         if(origin != null && origin.equals("admin.lotdiz.lotteedu.com")) {
           String auth = claims.get("auth", String.class);
-          if (!auth.equals("ADMIN")) { // admin 이 아니면 403
+          if (!auth.equals("ROLE_ADMIN")) { // admin 이 아니면 403
             return onError(exchange, "Not Admin", HttpStatus.FORBIDDEN);
           }
           return chain.filter(exchange);
