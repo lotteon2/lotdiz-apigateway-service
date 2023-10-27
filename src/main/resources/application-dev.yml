@@ -1,8 +1,32 @@
-
 spring:
   config:
     activate:
       on-profile: dev
+    import: optional:configserver:http://config-service:8888
+  # rabbitmq settings
+  rabbitmq:
+    host: rabbitmq-service
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - http://localhost:5173
+              - http://127.0.0.1:5173
+            allow-credentials: true
+            allowedHeaders:
+              - "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
 eureka:
   client:
     register-with-eureka: true

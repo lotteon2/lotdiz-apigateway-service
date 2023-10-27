@@ -2,6 +2,31 @@ spring:
   config:
     activate:
       on-profile: prod
+    import: optional:configserver:http://config-service:8888
+  # rabbitmq settings
+  rabbitmq:
+    host: rabbitmq-service
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - https://lotdiz.lotteedu.com
+              - https://admin.lotdiz.lotteedu.com
+            allow-credentials: true
+            allowedHeaders:
+              - "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
 eureka:
   client:
     register-with-eureka: true
