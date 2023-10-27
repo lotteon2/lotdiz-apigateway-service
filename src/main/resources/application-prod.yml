@@ -17,6 +17,7 @@ spring:
             allowedOrigins:
               - https://lotdiz.lotteedu.com
               - https://admin.lotdiz.lotteedu.com
+              - https://d2m2rob7qku22m.cloudfront.net
             allow-credentials: true
             allowedHeaders:
               - "*"
