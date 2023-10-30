@@ -19,7 +19,7 @@ spring:
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
-            - Path=/member-service/actuator/health,/member-service/api/sign-up,/member-service/api/sign-in
+            - Path=/member-service/actuator/health,/member-service/api/sign-up,/member-service/api/sign-in,/member-service/api/members/isDuplicated
             - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
