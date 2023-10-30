@@ -2,7 +2,6 @@ server:
   port: 8000
 spring:
   config:
-    import: "optional:configserver:"
     activate:
       on-profile: local,dev,prod
   application:
