@@ -29,6 +29,10 @@ public class OptionalAuthorizationHeaderFilter
   @Value("${jwt.secret}")
   private String secret;
 
+  public OptionalAuthorizationHeaderFilter() {
+    super(Config.class);
+  }
+
   @Override
   public GatewayFilter apply(Config config) {
     return ((exchange, chain) -> {
