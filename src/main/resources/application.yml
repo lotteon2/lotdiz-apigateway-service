@@ -84,9 +84,10 @@ spring:
           uri: lb://PROJECT-SERVICE
           predicates:
             - Path=/project-service/api/projects/{variable:.*}/support-signature
-            - Method=GET
+            - Method=GET,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+            - OptionalAuthorizationHeaderFilter
 
         # Optional White List
         - id: project-service
