@@ -103,6 +103,14 @@ spring:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
             - OptionalAuthorizationHeaderFilter
 
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/api/makers/projects
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         # Black List
         - id: project-service
           uri: lb://PROJECT-SERVICE
