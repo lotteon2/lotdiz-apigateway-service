@@ -18,7 +18,7 @@ spring:
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
-            - Path=/member-service/actuator/health,/member-service/api/sign-up,/member-service/api/sign-in
+            - Path=/member-service/actuator/health,/member-service/api/sign-up,/member-service/api/sign-in,/member-service/api/members/isDuplicated
             - Method=GET,POST,OPTIONS
           filters:
             - RewritePath=/member-service/(?<segment>.*), /$\{segment}
@@ -77,11 +77,6 @@ spring:
           predicates:
             - Path=/project-service/actuator/health,
               /project-service/api/projects/banner,
-              /project-service/api/projects,
-              /project-service/api/projects/lotdeal,
-              /project-service/api/projects/category/{variable:.*},
-              /project-service/api/projects/special-exhibition,
-              /project-service/api/projects/{variable:.*},
             - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
@@ -89,9 +84,24 @@ spring:
           uri: lb://PROJECT-SERVICE
           predicates:
             - Path=/project-service/api/projects/{variable:.*}/support-signature
-            - Method=GET
+            - Method=GET,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+            - OptionalAuthorizationHeaderFilter
+
+        # Optional White List
+        - id: project-service
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project-service/api/projects/lotdeal,
+              /project-service/api/projects/category/{variable:.*},
+              /project-service/api/projects/special-exhibition,
+              /project-service/api/projects/{variable:.*},
+              /project-service/api/projects
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RewritePath=/project-service/(?<segment>.*), /$\{segment}
+            - OptionalAuthorizationHeaderFilter
 
         # Black List
         - id: project-service
