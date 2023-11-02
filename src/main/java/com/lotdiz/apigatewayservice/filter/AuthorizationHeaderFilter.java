@@ -3,6 +3,7 @@ package com.lotdiz.apigatewayservice.filter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -47,7 +48,7 @@ public class AuthorizationHeaderFilter
 
       log.info("request path: " + request.getPath().pathWithinApplication().value());
       if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // 로그인 중
-        if(request.getHeaders().get(HttpHeaders.AUTHORIZATION) == null) {
+        if (request.getHeaders().get(HttpHeaders.AUTHORIZATION) == null) {
           return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
         }
         String jwtHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
@@ -56,26 +57,35 @@ public class AuthorizationHeaderFilter
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
-        Claims claims = checkValid(jwt, key); // 토큰 유효성 검사
+        try {
+          Claims claims = checkValid(jwt, key); // 토큰 유효성 검사
+          String username = claims.get("username", String.class);
 
-        String username = claims.get("username", String.class);
-
-        if (username == null) {
-          return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
-        }
-
-        // Token 정보를 까서 memberId를 header에 저장
-        String memberId = claims.get("memberId", String.class);
-        exchange.getRequest().mutate().header("memberId", memberId).build();
-
-        // 어드민 프론트
-        String origin = request.getHeaders().getOrigin();
-        if(origin != null && origin.equals("admin.lotdiz.lotteedu.com")) {
-          String auth = claims.get("auth", String.class);
-          if (!auth.equals("ROLE_ADMIN")) { // admin 이 아니면 403
-            return onError(exchange, "Not Admin", HttpStatus.FORBIDDEN);
+          if (username == null) {
+            return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
           }
-          return chain.filter(exchange);
+
+          // Token 정보를 까서 memberId를 header에 저장
+          String memberId = claims.get("memberId", String.class);
+          exchange.getRequest().mutate().header("memberId", memberId).build();
+
+          // 어드민 프론트
+          String origin = request.getHeaders().getOrigin();
+          if (origin != null && origin.equals("admin.lotdiz.lotteedu.com")) {
+            String auth = claims.get("auth", String.class);
+            if (!auth.equals("ROLE_ADMIN")) { // admin 이 아니면 403
+              return onError(exchange, "Not Admin", HttpStatus.FORBIDDEN);
+            }
+            return chain.filter(exchange);
+          }
+        } catch (IllegalArgumentException e) {
+          return onError(exchange, "잘못된 JWT 토큰입니다.", HttpStatus.UNAUTHORIZED);
+        } catch (MalformedJwtException e) {
+          return onError(exchange, "변조된 JWT 토큰입니다.", HttpStatus.UNAUTHORIZED);
+        } catch (ExpiredJwtException e) {
+          return onError(exchange, "만료된 JWT 토큰입니다.", HttpStatus.UNAUTHORIZED);
+        } catch (SignatureException e) {
+          return onError(exchange, "잘못된 JWT 서명입니다.", HttpStatus.UNAUTHORIZED);
         }
 
       } else {
@@ -87,16 +97,9 @@ public class AuthorizationHeaderFilter
     });
   }
 
-  private Claims checkValid(String jwt, SecretKey key) {
-    try {
-      return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-    } catch (IllegalArgumentException e) {
-      throw new RuntimeException("잘못된 JWT 토큰입니다.");
-    } catch (ExpiredJwtException e) {
-      throw new RuntimeException("만료된 JWT 토큰입니다.");
-    } catch (SignatureException e) {
-      throw new RuntimeException("잘못된 JWT 서명입니다.");
-    }
+  private Claims checkValid(String jwt, SecretKey key)
+      throws IllegalArgumentException, ExpiredJwtException, SignatureException {
+    return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
   }
 
   private Mono<Void> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
