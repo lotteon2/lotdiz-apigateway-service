@@ -10,6 +10,7 @@ env:
   AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
   IMAGE_TAG: ${{ github.sha }}
   AWS_EKS_CLUSTER_NAME: ${{ secrets.AWS_EKS_CLUSTER_NAME }}
+  AWS_CERTIFICATE_MANAGER_ARN: ${{ secrets.AWS_CERTIFICATE_MANAGER_ARN }}
 jobs:
   build:
     runs-on: ubuntu-latest
