@@ -106,7 +106,9 @@ spring:
         - id: project-service
           uri: lb://PROJECT-SERVICE
           predicates:
-            - Path=/project-service/api/makers/projects
+            - Path=/project-service/api/makers/projects,
+              /project-service/api/project/makers/projects,
+              /project-service/api/presigned-url
             - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/project-service/(?<segment>.*), /$\{segment}
